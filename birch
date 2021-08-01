@@ -7,7 +7,7 @@ clean() {
     # '\e[2J':     Clear the screen.
     # '\e[;r':     Reset the scroll area.
     # '\e[?1049l': Swap back to the primary screen.
-    printf '\e[?7h\e[2J\e[;r\e[?1049l'
+    printf '\e[?7h\e[2J\e[r\e[?1049l'
 
     rm -rf "$TMPDIR/birch-$$"
 
@@ -221,6 +221,10 @@ cmd() {
             send "AWAY"
         ;;
 
+        '/list')
+            printf "LIST\n" >&9
+        ;;
+
         /*)
             send "NOTICE :${1/ *} not implemented yet"
         ;;
@@ -345,8 +349,12 @@ parse() {
             prin "-- Away status: $mesg"
         ;;
 
-        00?|2[56]?|37?)
+        00?|2[56]?|37?|32?)
             dest=\*
+        ;;&
+
+        32?)
+            mesg="${fields[*]:2} $mesg"
         ;;&
 
         376)
